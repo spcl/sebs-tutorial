@@ -1,0 +1,19 @@
+{
+  "experiments": {
+    "architecture": "x64",
+    "deployment": "local",
+    "download_results": false,
+    "update_code": false,
+    "update_storage": false,
+    "runtime": {
+      "language": "python",
+      "version": "3.10"
+    }
+  },
+  "deployment": {
+    "name": "local",
+    "local": {
+      "storage": {}
+    }
+  }
+}
