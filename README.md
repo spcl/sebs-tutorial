@@ -23,6 +23,8 @@ For details on setting up your account, please check SeB'S documentation.
 
 ## Table of Contents
 
+Part 1 can be executed fully locally with just Docker. For part 2, you will need a cloud account or deploy OpenWhisk on your laptop - please check [OpenWhisk instructions](steps/0_setup_openwhisk.sh) as it takes a while to get it running.
+
 - [Part 0: Setup and Prerequisites](steps/0_setup.md)
 - [Part 1: Storage & Local Deployment](steps/1_local_deployment.md)
 - [Part 2: FaaS Platforms & Experiments](steps/2_faas_deployment.md)
@@ -96,17 +98,17 @@ sudo lsof -i :9000
 **Problem:** Pods stuck in `Pending` or `ContainerCreating` state
 
 **Solution:**
+
 Check pod details
 
 ```bash
 kubectl describe pod <pod-name> -n openwhisk
 ```
 
-You can restart the deployment
+You can delete the cluster and restart the deployment:
 
 ```bash
-kind delete cluster --name openwhisk
-cd tools && python3 openwhisk_preparation.py
+kind delete cluster
 ```
 
 ### SeBS Issues
