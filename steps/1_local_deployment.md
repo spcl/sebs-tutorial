@@ -70,7 +70,7 @@ Open in browser the address provided: `172.17.0.2:9000`.
 
 You should see the MinIO login dashboard, and later you can verify there are yet no buckets created.
 
-![images/minio-interface.png]
+![Login page of MinIO](../images/minio-interface.png)
 
 ### Optional: Play with MinIO Client
 
