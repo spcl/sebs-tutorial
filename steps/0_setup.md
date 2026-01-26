@@ -1,6 +1,6 @@
 ## Part 0: Setup and Prerequisites
 
-In this step, we will verify that your system provides all necessary tools to run 
+In this step, we will verify that your system provides all necessary tools to run SeBS.
 
 ### Verify Python Installation
 
@@ -41,9 +41,11 @@ echo '{"name": "test"}' | jq '.name'
 
 Expected output: `"test"`
 
-On Ubuntu, these packages should be sufficient to install `
+On Ubuntu, these packages should be sufficient to install `pycurl`:
 
-sudo apt-get install libssl-dev libcurl4-openssl-dev 
+```bash
+sudo apt-get install libssl-dev libcurl4-openssl-dev
+```
 
 ### Clone and Install SeBS
 
@@ -52,6 +54,17 @@ In this step, we will clone the SeBS repository and install it with support for 
 ```bash
 git clone --recursive https://github.com/spcl/serverless-benchmarks.git
 cd serverless-benchmarks
+```
+
+**Set Tutorial Directory Path:**
+
+Throughout this tutorial, we reference configuration files from the tutorial directory. Set this variable to make commands easier to copy:
+
+```bash
+export TUTORIAL_DIR=/path/to/sebs-tutorial
+
+# Example: If you cloned the tutorial to ~/sebs-tutorial, use:
+export TUTORIAL_DIR=~/sebs-tutorial
 ```
 
 Install SeBS with local and OpenWhisk support
@@ -99,7 +112,7 @@ SeBS has four main commands:
 4. **`local`**: Manage local Docker deployments
 5. **`resources`**: Manage resources created in the cloud.
 
-Here are few essential concepts that will make 
+Here are a few essential concepts that will help you understand SeBS:
 
 * **SeBS Workflow:**
 ```

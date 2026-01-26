@@ -19,7 +19,7 @@ You can provide it in `deployment.openwhisk.dockerhubRepository` in the configur
 In addition, we supply the storage configuration to connect to the MinIO instance started in the deployment steps:
 
 ```bash
-jq --arg ip ${EXTERNAL_IP} --slurpfile file1 outputs/storage.json '.deployment.openwhisk.storage = $file1[0] | .deployment.openwhisk.storage.object.minio.address = ($ip + ":9011")' <tutorial-dir>/configs/openwhisk.json > outputs/openwhisk_deployment.json
+jq --arg ip ${EXTERNAL_IP} --slurpfile file1 outputs/storage.json '.deployment.openwhisk.storage = $file1[0] | .deployment.openwhisk.storage.object.minio.address = ($ip + ":9011")' ${TUTORIAL_DIR}/configs/openwhisk.json > outputs/openwhisk_deployment.json
 ```
 
 When deploying to cloud platforms like AWS, Azure, or GCP, we do not need to manually set up object storage, as these platforms provide their own storage services.
@@ -191,8 +191,7 @@ We can list all activations (invocations); this command might have to be repeate
 wsk -i activation list
 ```
 
-You can select one of the activations and inspect the results, including the full response of the benchmark, as 
-well as execution logs.
+You can select one of the activations and inspect the results, including the full response of the benchmark and execution logs.
 
 ```bash
 wsk -i activation get <activation-id>
@@ -279,8 +278,8 @@ For example, we can redeploy `210.thumbnailer` in Node.js instead of Python:
     --language-version 20
 ```
 
-All other steps, such as analyzing timings and the results produced such be similar to the benchmark version for Python,
-with the difference in fewer intra-function measurements provided by the Node.js implementation.
+All other steps, such as analyzing timings and the results produced, should be similar to the benchmark version for Python,
+with the difference being fewer intra-function measurements provided by the Node.js implementation.
 
 ---
 
@@ -296,7 +295,7 @@ First, we will create a "new" benchmark function `110.dynamic-html-new`.
 cp -r benchmarks/100.webapps/110.dynamic-html benchmarks/100.webapps/110.dynamic-html-new
 ```
 
-In [`examples/new_dynamic_html.py`](examples/new_dynamic_html.py), we have prepared a modified version of the original function that includes three major changes:
+In [`../examples/new_dynamic_html.py`](../examples/new_dynamic_html.py), we have prepared a modified version of the original function that includes three major changes:
 * Extensive logging of all steps, which can be helpful in debugging and resolving crashes.
 * Additional time measurements, which are now returned as part of the result - similarly to the `210.thumbnailer` benchmark.
 * Use of the [`faker`](https://pypi.org/project/Faker/) library to generate random information about the user.
@@ -304,7 +303,7 @@ In [`examples/new_dynamic_html.py`](examples/new_dynamic_html.py), we have prepa
 You can view the changes introduced in the new version:
 
 ```bash
-diff <tutorial-dir>/examples/new_dynamic_html.py benchmarks/100.webapps/110.dynamic-html-new/python/function.py
+diff ${TUTORIAL_DIR}/examples/new_dynamic_html.py benchmarks/100.webapps/110.dynamic-html-new/python/function.py
 ```
 
 Then, for a successful deployment, we need to extend new benchmark to the SeBS configuration.
@@ -315,13 +314,13 @@ echo 'faker==30.0.0' >> benchmarks/100.webapps/110.dynamic-html-new/python/requi
 
 No other changes are needed, as SeBS will automatically detect the new benchmark based on the directory structure.
 
-When manually manually and redeploying benchmarks, SeBS will notice that the code has changed and redeploy the code package automatically.
+When manually modifying and redeploying benchmarks, SeBS will notice that the code has changed and redeploy the code package automatically.
 You will notice this by the presence of the following line in the output:
 
 ```
 Benchmark-1212 Building benchmark 110.dynamic-html-new. Reason: cached code package is not up to date/build enforced.
 ```
-However, OpenWhisk actions might not immediately adapt the new Docker image as they will keep existing warm workers.
+However, OpenWhisk actions might not immediately adopt the new Docker image as they will keep existing warm workers.
 
 Additionally, you can force SeBS to rebuild the code package by passing the `--update-code` flag.
 
@@ -432,8 +431,8 @@ We use the following parameters:
 This runs 5 parallel invocations of `110.dynamic-html` with 128MB memory, until we gather 15 samples, only considering warm invocations.
 For OpenWhisk, we need to modify the storage configuration to point to our MinIO instance:
 
-```json
-jq --arg ip ${EXTERNAL_IP} --slurpfile file1 outputs/storage.json '.deployment.openwhisk.storage = $file1[0] | .deployment.openwhisk.storage.object.minio.address = ($ip + ":9011")' ../tutorial/sebs-tutorial/configs/experiment_perf_cost.json > outputs/openwhisk_experiment.json
+```bash
+jq --arg ip ${EXTERNAL_IP} --slurpfile file1 outputs/storage.json '.deployment.openwhisk.storage = $file1[0] | .deployment.openwhisk.storage.object.minio.address = ($ip + ":9011")' ${TUTORIAL_DIR}/configs/experiment_perf_cost.json > outputs/openwhisk_experiment.json
 ```
 
 Additionally, the experiment configuration should also use the custom `dockerhubRepository`.
@@ -537,7 +536,7 @@ We do not have any data for `mem_used`, as this metric is not currently supporte
 
 ### Optional: Run with Cold Starts
 
-To measure cold starts, add `cold` benchmark scenario to the experiment in `experiments.perf-cost.experiments`.
+To measure cold starts, add the `cold` benchmark scenario to the experiment in `experiments.perf-cost.experiments`.
 
 ```bash
 # Create config without warm_invocations flag
@@ -578,7 +577,7 @@ Expected: Empty (no MinIO container)
 kind delete cluster
 ```
 
-Verify with this command. Expected: rror (no cluster)
+Verify with this command. Expected: Error (no cluster)
 
 ```bash
 kubectl get nodes

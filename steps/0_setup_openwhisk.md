@@ -10,7 +10,7 @@ If you deploy OpenWhisk on an existing Kubernetes cluster, then please configure
 ### DockerHub Account
 
 SeBS uses Docker containers to deploy functions on OpenWhisk due to small size limit on code packages.
-To that end, you need a DockerHub account to push containers, as private Docker registries do not work well on `kind` and `OpenWhisk.`
+To that end, you need a DockerHub account to push containers, as private Docker registries do not work well on `kind` and `OpenWhisk`.
 If you don't have an account, then create [a free one](https://www.docker.com/products/personal/), and create a test repository for your functions.
 In the command line, use `docker login` to activate your account.
 Make sure that your registry is public - otherwise, OpenWhisk won't able to pull function images.
@@ -32,7 +32,7 @@ We will install the following tools to deploy OpenWhisk:
 - `kubectl 1.20.0` (management tool for Kubernetes clusters)
 - `helm 3.14.4` (package manager for Kubernetes, used by OpenWhisk deployment)
 - `wsk 1.20` (OpenWhisk CLI tool)
-While newer versions of these tool can be used, this configuration has been verified to work with OpenWhiks.
+While newer versions of these tools can be used, this configuration has been verified to work with OpenWhisk.
 
 ### Check Go Installation
 
@@ -76,7 +76,7 @@ Clone the OpenWhisk deployment repository:
 git clone git@github.com:apache/openwhisk-deploy-kube.git
 ```
 
-Before we deploy OpenWhisk, we need to adjust it configuration to support all benchmarks.
+Before we deploy OpenWhisk, we need to adjust its configuration to support all benchmarks.
 Default configuration allows functions to use not more than 512 MB of memory, which is insufficient for some benchmarks.
 In `helm/openwhisk/values.yaml`, find the following settings:
 
@@ -122,7 +122,7 @@ Creating cluster "kind" ...
 Set kubectl context to "kind-kind"
 You can now use your cluster with:
 
-kubectl cluster-info --context kind-kind``
+kubectl cluster-info --context kind-kind
 ```
 
 You can verify that a cluster has been created:
@@ -145,7 +145,7 @@ You can use this command to wait until all pods are in the `Running` or `Complet
 kubectl get pods -n openwhisk --watch
 ```
 
-Once you invoker tests and prewarming containers, then your OpenWhisk deployment should be finished:
+Once you see the invoker tests and prewarming containers, your OpenWhisk deployment should be finished:
 
 ```
 wskowdev-invoker-00-6-whisksystem-invokerhealthtestaction0   1/1     Running       0          10s
@@ -207,7 +207,7 @@ echo "External IP: $EXTERNAL_IP"
 **Important:** This should NOT be `127.0.0.1` (won't work from Kubernetes pods).
 
 The actual address will be `${EXTERNAL_IP}:${MAPPED_PORT}`, where `MAPPED_PORT` is by default the port `9011`.
-You can verify the exact port
+You can verify the exact port by checking the output of the storage start command.
 
 **Test connectivity from host:**
 ```bash
@@ -231,4 +231,6 @@ Expected: `"<your-external-ip>:9011"` (not 127.0.0.1:9011)
 
 ## Configure DockerHub Repository for OpenWhisk
 
-TODO
+Update the SeBS configuration file to use your DockerHub repository. Edit the `deployment.openwhisk.dockerhubRepository` field in your configuration file to point to your DockerHub username and repository (e.g., `username/repository-name`).
+
+This configuration will be used when deploying functions to OpenWhisk in the next tutorial steps.

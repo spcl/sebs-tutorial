@@ -11,10 +11,10 @@ mkdir -p outputs
 ## Storage Integration
 
 Object storage is one of the fundamental building blocks of serverless applications.
-It works as as primary input and output mechanism for large and persistent objects,
+It works as a primary input and output mechanism for large and persistent objects,
 and is also used by SeBS to upload artifacts and manage cloud deployment.
 When working with a cloud system, we use the object storage implementation provided by the platform (e.g., AWS S3, Azure Blob Storage, Google Cloud Storage).
-When working working locally and deploying functions to platforms that do not provide their own storage system, such as OpenWhisk,
+When working locally and deploying functions to platforms that do not provide their own storage system, such as OpenWhisk,
 we use alternative object storage implementations as a replacement.
 
 ### Start MinIO Storage
@@ -25,13 +25,15 @@ You can inspect the file and change options such as MinIO version,
 container's access port mapped to your host system, and the local directory used to store objects.
 
 Use the command below to start a containerized instance of the storage.
-SeBS will pull the MinIO Pulls MinIO Docker image (if not cached already),
+SeBS will pull the MinIO Docker image (if not cached already),
 start a MinIO server with container port forwarded to the port 9011 on the system.
 
 ```bash
-./sebs.py storage start object <tutorial-dir>/configs/storage_base.json \
+./sebs.py storage start object ${TUTORIAL_DIR}/configs/storage_base.json \
     --output-json outputs/storage.json
 ```
+
+**Note:** If you haven't set the `TUTORIAL_DIR` variable, see Part 0: Setup for instructions.
 
 **Expected behavior:**
 
@@ -75,8 +77,13 @@ You should see the MinIO login dashboard, and later you can verify there are yet
 ### Optional: Play with MinIO Client
 
 You can use the MinIO CLI to learn basic operations like creating buckets and putting objects.
-First, find in the JSON output the ID of container hosting the MinIO server,
-as well as the access credentials.
+First, extract the container ID and access credentials from the storage configuration:
+
+```bash
+CONTAINER_ID=$(jq -r '.object.minio.instance_id' outputs/storage.json)
+ACCESS_KEY=$(jq -r '.object.minio.access_key' outputs/storage.json)
+SECRET_KEY=$(jq -r '.object.minio.secret_key' outputs/storage.json)
+```
 
 We will use the `mc` command inside the MinIO container to interact with the server.
 First, we will configure the authorization.
@@ -121,8 +128,8 @@ invoke the function, and examine results. Additionally, we will have an opportun
 ### Benchmark Selection
 
 We'll use the benchmark `110.dynamic-html`.
-It a simple example of web application with pure computation (random number generation + HTML template rendering),
-no storage usage, dependencies and fast execution
+It's a simple example of a web application with pure computation (random number generation + HTML template rendering),
+minimal dependencies, no storage usage, and fast execution.
 
 First, let's examine the benchmark structure:
 
@@ -166,7 +173,7 @@ Deploy 110.dynamic-html with test input size and storage configuration from the 
 
 ```bash
 ./sebs.py local start 110.dynamic-html test outputs/local_output.json \
-    --config <tutorial-dir>/configs/local.json \
+    --config ${TUTORIAL_DIR}/configs/local.json \
     --storage-configuration outputs/storage.json \
     --deployments 1
 ```
@@ -175,7 +182,7 @@ Alternatively, you can embed the storage configuration directly into the local c
 Then, this new file becomes the main `config` and the `--storage-configuration` flag is not needed.
 
 ```bash
-jq --slurpfile file1 outputs/storage.json '.deployment.local.storage = $file1[0]' <tutorial-dir>/configs/local.json > outputs/local_deployment.json
+jq --slurpfile file1 outputs/storage.json '.deployment.local.storage = $file1[0]' ${TUTORIAL_DIR}/configs/local.json > outputs/local_deployment.json
 ./sebs.py local start 110.dynamic-html test outputs/local_output.json \
     --config outputs/local_deployment.json \
     --deployments 1
@@ -295,7 +302,7 @@ We can verify that our deployment is healthy and works:
 ```bash
 FUNC_URL=$(jq -r '.functions[0].url' outputs/local_output.json)
 
-curl ${FUNCTION_URL}/alive --request GET
+curl ${FUNC_URL}/alive --request GET
 ```
 
 Additionally, we can find all informations on the function deployment in the `cache`.
@@ -362,7 +369,7 @@ docker ps
 
 ### Deploy Storage-Dependent Benchmark
 
-We'll use `210.thubmnailer`, which creates a thumbnailer from an image:
+We'll use `210.thumbnailer`, which creates a thumbnail from an image:
 - Downloads a file from the storage.
 - Calls an optimized library - like `Pillow` in Python or `sharp` in Node.js - to create a thumbnail.
 - Uploads result back to storage.
@@ -378,7 +385,7 @@ SeBS will automatically switch the deployment and build process, also updating t
 
 ```bash
 ./sebs.py local start 210.thumbnailer test outputs/local_output.json \
-    --config ../tutorial/sebs-tutorial/configs/local.json \
+    --config ${TUTORIAL_DIR}/configs/local.json \
     --storage-configuration outputs/storage.json \
     --deployments 1
 ```
@@ -440,10 +447,26 @@ SeBS will supply custom wrappers for each deployment platform, allowing the benc
 ### Invoke Benchmark
 
 First, let's verify that benchmark inputs are actually available in the storage, either through the web interface or with the CLI tool.
-The resource ID and the full bucket name can be found in previous steps, as well as in the cache and the inputs generated in `outputs/local_output.json`.
+
+We need to extract the resource ID and container ID to access the storage. You can skip that step if you have done it already in previous steps.
 
 ```bash
-docker exec ${CONTAINER_ID} mc ls local/sebs-benchmarks-local-${RESOURCE_ID}/210.thumbnailer-0-input/
+CONTAINER_ID=$(jq -r '.object.minio.instance_id' outputs/storage.json)
+ACCESS_KEY=$(jq -r '.object.minio.access_key' outputs/storage.json)
+SECRET_KEY=$(jq -r '.object.minio.secret_key' outputs/storage.json)
+docker exec ${CONTAINER_ID} mc alias set local http://localhost:9000 ${ACCESS_KEY} ${SECRET_KEY}
+```
+
+Then, we extract the bucket name as its exact name depends on the resource ID assigned to this SeBS deployment.
+
+```bash
+BUCKET_NAME=$(jq -r '.inputs[0].bucket.bucket' outputs/local_output.json)
+```
+
+Now, we can actually list the input files in the storage:
+
+```bash
+docker exec ${CONTAINER_ID} mc ls local/${BUCKET_NAME}/210.thumbnailer-0-input/
 ```
 
 You should see ten input files, of different sizes:
@@ -530,10 +553,10 @@ Additionally, the output contains the location of the uploaded thumbnail image.
 ### Verify Results
 
 As a final step, we check that the function has actually computed the result.
-When using the CLI, we execute the following commands to find the resulting image:
+When using the CLI, we execute the following commands to find the resulting image.
 
 ```bash
-docker exec ${CONTAINER_ID} mc ls local/sebs-benchmarks-local-${RESOURCE_ID}/210.thumbnailer-0-output/
+docker exec ${CONTAINER_ID} mc ls local/${BUCKET_NAME}/210.thumbnailer-0-output/
 ```
 
 The output should show the generated thumbnail image that is now much smaller
@@ -542,12 +565,12 @@ The output should show the generated thumbnail image that is now much smaller
 [2026-01-25 15:36:46 UTC] 3.4KiB STANDARD 6_astronomy-desktop-wallpaper-evening-1624438.908b9b4a.jpg
 ```
 
-We can download it from storage. Each benchmark execution will result in a unique output file name,
+We can download it from storage. Each benchmark execution will result in a unique output file name.
 
 ```bash
 docker exec ${CONTAINER_ID} mc cp local/sebs-benchmarks-local-${RESOURCE_ID}/210.thumbnailer-0-output/6_astronomy-desktop-wallpaper-evening-1624438.908b9b4a.jpg /tmp/6_astronomy-desktop-wallpaper-evening-1624438.908b9b4a.jpg
 
-docker cp 20ea4:/tmp/6_astronomy-desktop-wallpaper-evening-1624438.908b9b4a.jpg .
+docker cp ${CONTAINER_ID}:/tmp/6_astronomy-desktop-wallpaper-evening-1624438.908b9b4a.jpg .
 ```
 
 We can compare the result with the original input file: `benchmarks-data/200.multimedia/210.thumbnailer/6_astronomy-desktop-wallpaper-evening-1624438.jpg`.
