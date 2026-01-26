@@ -29,7 +29,7 @@ For details on setting up your account, please check SeBS documentation.
 
 ## Table of Contents
 
-Part 1 can be executed fully locally with just Docker. For part 2, you will need a cloud account or deploy OpenWhisk on your laptop - please check [OpenWhisk instructions](steps/0_setup_openwhisk.sh) as it takes a while to get it running.
+Part 1 can be executed fully locally with just Docker. For part 2, you will need a cloud account or deploy OpenWhisk on your laptop - please check [OpenWhisk instructions](steps/0_setup_openwhisk.md) as it takes a while to get it running.
 
 - [Part 0: Setup and Prerequisites](steps/0_setup.md)
 - [Part 1: Storage & Local Deployment](steps/1_local_deployment.md)
