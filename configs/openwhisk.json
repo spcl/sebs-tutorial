@@ -1,0 +1,25 @@
+{
+  "experiments": {
+    "deployment": "openwhisk",
+    "update_code": false,
+    "update_storage": false,
+    "download_results": false,
+    "architecture": "x64",
+    "container_deployment": true,
+    "runtime": {
+      "language": "python",
+      "version": "3.9"
+    }
+  },
+  "deployment": {
+    "name": "openwhisk",
+    "openwhisk": {
+      "dockerhubRepository": "spcleth/test-openwhisk",
+      "wskBypassSecurity": "true",
+      "wskExec": "wsk",
+      "experimentalManifest": "false",
+      "shutdownStorage": false,
+      "removeCluster": false
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "experiments": {
+    "deployment": "openwhisk",
+    "update_code": false,
+    "update_storage": false,
+    "download_results": false,
+    "architecture": "x64",
+    "container_deployment": true,
+    "runtime": {
+      "language": "python",
+      "version": "3.9"
+    },
+    "type": "perf-cost",
+    "perf-cost": {
+      "benchmark": "110.dynamic-html",
+      "experiments": [
+        "warm"
+      ],
+      "input-size": "test",
+      "repetitions": 15,
+      "concurrent-invocations": 5,
+      "memory-sizes": [
+        128
+      ]
+    }
+  },
+  "deployment": {
+    "name": "openwhisk",
+    "openwhisk": {
+      "dockerhubRepository": "spcleth/test-openwhisk",
+      "wskBypassSecurity": "true",
+      "wskExec": "wsk",
+      "experimentalManifest": "false",
+      "shutdownStorage": false,
+      "removeCluster": false
+    }
+  }
+}

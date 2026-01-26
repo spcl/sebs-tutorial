@@ -33,7 +33,7 @@ start a MinIO server with container port forwarded to the port 9011 on the syste
     --output-json outputs/storage.json
 ```
 
-**Expected output:**
+**Expected behavior:**
 
 ```
 minio.Minio-82ae Minio storage ACCESS_KEY=XXXX
