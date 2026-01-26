@@ -2,7 +2,13 @@
 
 This hands-on session will guide you through deploying, testing, and benchmarking serverless functions using SeBS on both local Docker and OpenWhisk platforms.
 Alternatively, you can deploy all functions to the cloud.
-For details on setting up your account, please check SeB'S documentation.
+For details on setting up your account, please check SeBS documentation.
+
+## Main Resources
+
+* [SeBS Repository](https://github.com/spcl/serverless-benchmarks)
+* [SeBS Paper](https://mcopik.github.io/publications#copik2020sebs)
+* [SeBS-Flow Paper](https://mcopik.github.io/publications/#2025sebsflow)
 
 ---
 
