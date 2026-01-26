@@ -14,7 +14,7 @@
   "deployment": {
     "name": "openwhisk",
     "openwhisk": {
-      "dockerhubRepository": "spcleth/test-openwhisk",
+      "dockerhubRepository": "",
       "wskBypassSecurity": "true",
       "wskExec": "wsk",
       "experimentalManifest": "false",
