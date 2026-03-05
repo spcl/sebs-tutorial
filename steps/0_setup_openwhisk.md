@@ -192,7 +192,7 @@ First, deploy the storage as in the previous exercise:
 
 ```bash
 ./sebs.py storage start object config/storage.json \
-    --output-json outputs/storage.json
+    --output-json outputs/storage_ow.json
 ```
 
 ### Get External IP Address
